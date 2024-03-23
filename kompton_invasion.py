@@ -26,3 +26,10 @@ ALIEN_SPEED = 3
 # Initialize the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Kompton Invasion")
+
+#  Load images
+player_img = pygame.image.load('spaceship.png')
+alien_img = pygame.image.load('alien.png')
+
+# Clock for controlling the frame rate
+clock = pygame.time.Clock()

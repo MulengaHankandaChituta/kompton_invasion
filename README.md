@@ -44,3 +44,4 @@ Credits:
 - Special thanks to the Pygame community for their resources and support.
 
 License:
+This project is licensed under the [MIT] License - see the LICENSE file for details.
