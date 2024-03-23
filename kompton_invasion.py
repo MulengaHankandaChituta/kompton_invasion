@@ -33,3 +33,45 @@ alien_img = pygame.image.load('alien.png')
 
 # Clock for controlling the frame rate
 clock = pygame.time.Clock()
+
+# Define the player class
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = SCREEN_WIDTH // 2
+        self.rect.centery = SCREEN_HEIGHT // 2
+
+    def update(self, direction):
+        if direction == "UP":
+            self.rect.y -= PLAYER_SPEED
+        elif direction == "DOWN":
+            self.rect.y += PLAYER_SPEED
+        elif direction == "LEFT":
+            self.rect.x -= PLAYER_SPEED
+        elif direction == "RIGHT":
+            self.rect.x += PLAYER_SPEED
+
+        # Keep player within screen boundaries
+        self.rect.x = max(0, min(SCREEN_WIDTH - PLAYER_WIDTH, self.rect.x))
+        self.rect.y = max(0, min(SCREEN_HEIGHT - PLAYER_HEIGHT, self.rect))
+
+    # Define the alien class
+    class Alien(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.transform.scale(alien_img, (ALIEN_WIDTH, ALIEN_HEIGHT))
+            self.rect = self.image.get_rect()
+            self.rect.x = random.randrange(SCREEN_WIDTH, SCREEN_WIDTH, + 200)
+            self.rect.y = random.randrange(SCREEN_HEIGHT - ALIEN_HEIGHT)
+            self.speed = random.randint(1, ALIEN_SPEED)
+
+        def update(self):
+            self.rect.x -= self.speed
+            if self.rect.right < 0:
+                self.rect.x = random.randrange(SCREEN_WIDTH, SCREEN_WIDTH + 200)
+                self.rect.y = random.randrange(SCREEN_HEIGHT - ALIEN_HEIGHT)
+                self.speed = random.randint(1, ALIEN_SPEED)
+                
+
