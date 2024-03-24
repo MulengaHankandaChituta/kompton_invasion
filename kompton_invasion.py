@@ -23,6 +23,11 @@ ALIEN_WIDTH = 50
 ALIEN_HEIGHT = 50
 ALIEN_SPEED = 3
 
+# Projectile settings
+PROJECTILE_WIDTH = 5
+PROJECTILE_HEIGHT = 10
+PROJECTILE_SPEED = 8
+
 # Initialize the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Kompton Invasion")
@@ -42,6 +47,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = SCREEN_WIDTH // 2
         self.rect.centery = SCREEN_HEIGHT // 2
+        self.projectiles = pygame.sprite.Group() # Group to store projectiles
 
     def update(self, direction=None):
         if direction == "UP":
@@ -56,6 +62,11 @@ class Player(pygame.sprite.Sprite):
         # Keep player within screen boundaries
         self.rect.x = max(0, min(SCREEN_WIDTH - PLAYER_WIDTH, self.rect.x))
         self.rect.y = max(0, min(SCREEN_HEIGHT - PLAYER_HEIGHT, self.rect.y))
+
+    def shoot(self):
+        # Create a new projectile
+        projectile = Projectile(self.rect.centerx, self.rect.top)
+        self.projectiles.add(projectile,)
 
 # Define the alien class
 class Alien(pygame.sprite.Sprite):
@@ -74,6 +85,23 @@ class Alien(pygame.sprite.Sprite):
             self.rect.y = random.randrange(SCREEN_HEIGHT - ALIEN_HEIGHT)
             self.speed = random.randint(1, ALIEN_SPEED)
 
+# define the projectile class
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((PROJECTILE_WIDTH, PROJECTILE_HEIGHT))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+
+    def update(self):
+        # Move the projectile up
+        self.rect.y -= PROJECTILE_SPEED
+        # Remove the projectile if it goes of the screen
+        if self.rect.bottom < 0:
+            self.kill()
+
 # Create sprite groups
 all_sprites = pygame.sprite.Group()
 aliens = pygame.sprite.Group()
@@ -90,7 +118,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()  # Shoot when SPACE key is pressed
     # Get keyboard input
     keys = pygame.key.get_pressed()
     direction = None
@@ -112,14 +142,20 @@ while running:
     # Update sprites
     all_sprites.update(direction)
 
+    # Update projectiles
+    player.projectiles.update()
+
     # Check for collisions
-    collisions = pygame.sprite.spritecollide(player, aliens, True)
-    for collision in collisions:
-        score += 1
+    collisions = pygame.sprite.groupcollide(player.projectiles, aliens, True, True)
+    for projectile in player.projectiles:
+        collisions = pygame.sprite.spritecollide(projectile, aliens, True)
+        for collision in collisions:
+            score += 1
 
     # Draw everything
     screen.fill(BLACK)
     all_sprites.draw(screen)
+    player.projectiles.draw(screen)
 
     # Display score
     font = pygame.font.Font(None, 36)
