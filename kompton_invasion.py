@@ -28,6 +28,8 @@ PROJECTILE_WIDTH = 5
 PROJECTILE_HEIGHT = 10
 PROJECTILE_SPEED = 8
 
+
+
 # Initialize the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Kompton Invasion")
@@ -84,6 +86,7 @@ class Alien(pygame.sprite.Sprite):
             self.rect.x = random.randrange(SCREEN_WIDTH)
             self.rect.y = 0
             self.speed = random.randint(1, ALIEN_SPEED)
+
 # define the projectile class
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -100,6 +103,18 @@ class Projectile(pygame.sprite.Sprite):
         # Remove the projectile if it goes of the screen
         if self.rect.bottom < 0:
             self.kill()
+
+# Define the star class
+class Star(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('star.png').convert_alpha()  # Load the star image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, SCREEN_WIDTH)  # Randomly position the star horizontally
+        self.rect.y = random.randint(-SCREEN_HEIGHT, 0)  # Position the star above the screen
+
+    def update(self):
+        self.rect.y += 1  # Move the star downwards
 
 # Create sprite groups
 all_sprites = pygame.sprite.Group()
@@ -143,6 +158,7 @@ while running:
 
     # Update projectiles
     player.projectiles.update()
+
 
     # Check for collisions
     collisions = pygame.sprite.groupcollide(player.projectiles, aliens, True, True)
