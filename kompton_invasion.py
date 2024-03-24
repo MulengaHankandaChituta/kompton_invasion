@@ -21,7 +21,7 @@ PLAYER_SPEED = 5  # Corrected typo in variable name
 # Alien Settings
 ALIEN_WIDTH = 50
 ALIEN_HEIGHT = 50
-ALIEN_SPEED = 3
+ALIEN_SPEED = 1
 
 # Projectile settings
 PROJECTILE_WIDTH = 5
@@ -74,17 +74,16 @@ class Alien(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.transform.scale(alien_img, (ALIEN_WIDTH, ALIEN_HEIGHT))
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(SCREEN_WIDTH, SCREEN_WIDTH + 200)
-        self.rect.y = random.randrange(SCREEN_HEIGHT - ALIEN_HEIGHT)
+        self.rect.x = random.randrange(SCREEN_WIDTH)
+        self.rect.y = 0  # Set y-coordinate to 0 to ensure aliens appear at the top
         self.speed = random.randint(1, ALIEN_SPEED)
 
     def update(self, direction):
-        self.rect.x -= self.speed
-        if self.rect.right < 0:
-            self.rect.x = random.randrange(SCREEN_WIDTH, SCREEN_WIDTH + 200)
-            self.rect.y = random.randrange(SCREEN_HEIGHT - ALIEN_HEIGHT)
+         self.rect.y += self.speed
+         if self.rect.top > SCREEN_HEIGHT:
+            self.rect.x = random.randrange(SCREEN_WIDTH)
+            self.rect.y = 0
             self.speed = random.randint(1, ALIEN_SPEED)
-
 # define the projectile class
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y):
