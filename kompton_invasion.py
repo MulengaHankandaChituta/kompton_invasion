@@ -104,17 +104,7 @@ class Projectile(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
-# Define the star class
-class Star(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = pygame.image.load('star.png').convert_alpha()  # Load the star image
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, SCREEN_WIDTH)  # Randomly position the star horizontally
-        self.rect.y = random.randint(-SCREEN_HEIGHT, 0)  # Position the star above the screen
 
-    def update(self):
-        self.rect.y += 1  # Move the star downwards
 
 # Create sprite groups
 all_sprites = pygame.sprite.Group()
