@@ -147,9 +147,9 @@ while running:
 
     # Check for collisions
     collisions = pygame.sprite.groupcollide(player.projectiles, aliens, True, True)
-    for projectile in player.projectiles:
+    for projectile, collided_aliens in collisions.items():
         collisions = pygame.sprite.spritecollide(projectile, aliens, True)
-        for collision in collisions:
+        for alien in collided_aliens:
             score += 1
 
     # Draw everything
