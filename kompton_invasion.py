@@ -125,6 +125,11 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.shoot()  # Shoot when SPACE key is pressed
+
+    # Check for collisions between player and aliens
+    collided_aliens = pygame.sprite.spritecollide(player, aliens, True)
+    for alien in collided_aliens:
+        pass
     # Get keyboard input
     keys = pygame.key.get_pressed()
     direction = None
