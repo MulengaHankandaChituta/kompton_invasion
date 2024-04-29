@@ -21,7 +21,7 @@ PLAYER_SPEED = 5  # Corrected typo in variable name
 # Alien Settings
 ALIEN_WIDTH = 50
 ALIEN_HEIGHT = 50
-ALIEN_SPEED = 1
+ALIEN_SPEED = 0.5
 
 # Projectile settings
 PROJECTILE_WIDTH = 5
@@ -49,16 +49,17 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = SCREEN_WIDTH // 2
         self.rect.centery = SCREEN_HEIGHT // 2
-        self.projectiles = pygame.sprite.Group() # Group to store projectiles
+        self.projectiles = pygame.sprite.Group()
 
-    def update(self, direction=None):
-        if direction == "UP":
+    def update(self, keys):
+        direction = [keys[pygame.K_UP], keys[pygame.K_DOWN], keys[pygame.K_LEFT], keys[pygame.K_RIGHT]]
+        if direction[0]:
             self.rect.y -= PLAYER_SPEED
-        elif direction == "DOWN":
+        elif direction[1]:
             self.rect.y += PLAYER_SPEED
-        elif direction == "LEFT":
+        elif direction[2]:
             self.rect.x -= PLAYER_SPEED
-        elif direction == "RIGHT":
+        elif direction[3]:
             self.rect.x += PLAYER_SPEED
 
         # Keep player within screen boundaries
@@ -68,24 +69,24 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         # Create a new projectile
         projectile = Projectile(self.rect.centerx, self.rect.top)
-        self.projectiles.add(projectile,)
+        self.projectiles.add(projectile)
 
 # Define the alien class
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.transform.scale(alien_img, (ALIEN_WIDTH, ALIEN_HEIGHT))
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect()  # Initialize the rect attribute
         self.rect.x = random.randrange(SCREEN_WIDTH)
         self.rect.y = 0  # Set y-coordinate to 0 to ensure aliens appear at the top
-        self.speed = random.randint(1, ALIEN_SPEED)
+        self.speed = random.uniform(0.5, ALIEN_SPEED)
 
-    def update(self, direction):
+    def update(self):
          self.rect.y += self.speed
          if self.rect.top > SCREEN_HEIGHT:
             self.rect.x = random.randrange(SCREEN_WIDTH)
             self.rect.y = 0
-            self.speed = random.randint(1, ALIEN_SPEED)
+            self.speed = random.uniform(0.5, ALIEN_SPEED)
 
 # define the projectile class
 class Projectile(pygame.sprite.Sprite):
@@ -126,21 +127,14 @@ while running:
             if event.key == pygame.K_SPACE:
                 player.shoot()  # Shoot when SPACE key is pressed
 
-    # Check for collisions between player and aliens
-    collided_aliens = pygame.sprite.spritecollide(player, aliens, True)
-    for alien in collided_aliens:
-        pass
     # Get keyboard input
     keys = pygame.key.get_pressed()
-    direction = None
-    if keys[pygame.K_UP]:
-        direction = "UP"
-    elif keys[pygame.K_DOWN]:
-        direction = "DOWN"
-    elif keys[pygame.K_LEFT]:
-        direction = "LEFT"
-    elif keys[pygame.K_RIGHT]:
-        direction = "RIGHT"
+
+    # Update player
+    player.update(keys)
+
+    # Update aliens
+    aliens.update()
 
     # Spawn aliens
     if len(aliens) < 5:
@@ -148,8 +142,38 @@ while running:
         all_sprites.add(alien)
         aliens.add(alien)
 
+    # Update projectiles
+    player.projectiles.update()
+
+    # Check for collisions
+    collisions = pygame.sprite.groupcollide(player.projectiles, aliens, True, True)
+    for projectile, collided_aliens in collisions.items():
+        for alien in collided_aliens:
+            score += 1
+
+    # Draw everything
+    screen.fill(BLACK)
+    all_sprites.draw(screen)
+    player.projectiles.draw(screen)
+
+    # Display score
+    font = pygame.font.Font(None, 36)
+    text = font.render(f"Score: {score}", True, RED)
+    screen.blit(text, (10, 10))
+
+    # Update the display
+    pygame.display.flip()
+
+    # Cap the frame rate
+    clock.tick(60)
+    # Spawn aliens
+    if len(aliens) < 5:
+        alien = Alien()
+        all_sprites.add(alien)
+        aliens.add(alien)
+
     # Update sprites
-    all_sprites.update(direction)
+    player.update(keys)
 
     # Update projectiles
     player.projectiles.update()
